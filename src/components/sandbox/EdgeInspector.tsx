@@ -83,14 +83,19 @@ export function EdgeInspector() {
       <div id="edge-telemetry" hidden={!expanded} className="border-t border-term-line">
         <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6">
           <dl className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3 lg:grid-cols-6">
-            <Metric label="Idratazione client" value={formatMs(telemetry.hydrationMs)} hint="performance.now() al mount" />
-            <Metric label="TTFB reale" value={formatMs(telemetry.ttfbMs)} hint="PerformanceNavigationTiming" />
-            <Metric label="LCP reale" value={formatMs(telemetry.lcpMs)} hint="PerformanceObserver" />
-            <Metric label="Documento HTML" value={documentSize} hint="transferSize / encodedBodySize" />
-            <Metric label="Outbox locale" value={`${waiting} in coda · ${dead} DLQ`} hint="Record in IndexedDB" />
-            <Metric label="Edge → CRM" value={connection} hint="Legato al toggle nella console" />
+            <Metric label="Idratazione client" value={formatMs(telemetry.hydrationMs)} hint="Reattività immediata ai click · performance.now()" />
+            <Metric label="TTFB reale" value={formatMs(telemetry.ttfbMs)} hint="Zero attesa prima risposta · NavTiming" />
+            <Metric label="LCP reale" value={formatMs(telemetry.lcpMs)} hint="Contenuto visibile istantaneo · PerformanceObserver" />
+            <Metric label="Documento HTML" value={documentSize} hint="Ultra-leggero su mobile · transferSize" />
+            <Metric label="Stadio 1: Coda locale" value={`${waiting} in coda · ${dead} DLQ`} hint="Outbox IndexedDB su disconnessione client" />
+            <Metric label="Stadio 2: Edge → CRM" value={connection} hint="Coda server-side (simulata in sandbox locale)" />
           </dl>
-          <p className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-term-muted">
+
+          <div className="mt-3.5 rounded bg-term-line/20 p-2.5 text-[11px] leading-relaxed text-term-muted">
+            <span className="font-semibold text-term-ink">Nota architetturale disaccoppiamento:</span> in produzione il flusso opera a doppio stadio: <strong>Stadio 1 (Client → Edge)</strong> tramite Outbox su IndexedDB per tolleranza alla perdita di rete del dispositivo; <strong>Stadio 2 (Edge → CRM)</strong> tramite coda persistente server-side (Cloudflare Queues / Redis) con retry e DLQ asincroni indipendenti dal browser. In questa sandbox dimostrativa, entrambi gli stadi sono eseguiti nel browser per permettere l&apos;ispezione interattiva in tempo reale senza mutare code cloud.
+          </div>
+
+          <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-term-muted">
             <span>Reference Architecture #2 — metriche misurate nel tuo browser, non simulate.</span>
             <a href={TECHPYRE.url} className="inline-flex items-center gap-1 text-term-ink hover:underline">
               techpyre.eu <ExternalLink className="h-3 w-3" aria-hidden="true" />

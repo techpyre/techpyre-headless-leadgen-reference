@@ -149,10 +149,15 @@ export function ChaosConsole() {
         <div className="flex items-baseline justify-between gap-3">
           <h3 className="text-lg font-semibold text-ink">Chaos &amp; Failover Inspector</h3>
           <span className="shrink-0 font-mono text-xs text-faint">
-            {backend === "indexeddb" ? "IndexedDB" : backend === "memory" ? "memoria" : "…"}
+            {backend === "indexeddb" ? "IndexedDB sandbox" : backend === "memory" ? "memoria" : "…"}
           </span>
         </div>
-        <p className="mt-1 text-[15px] text-muted">Spegni il CRM, invia il form e guarda la coda.</p>
+        <p className="mt-1 text-sm font-medium text-ink">
+          Zero contatti persi durante i disservizi o i rallentamenti del CRM.
+        </p>
+        <p className="mt-0.5 text-xs text-muted leading-relaxed">
+          Se il tuo CRM è in manutenzione o rallenta mentre una campagna Ads è attiva, un sito tradizionale perde il contatto. Qui il lead viene messo in sicurezza e sincronizzato appena il CRM torna operativo. Fai un test spegnendo il CRM.
+        </p>
 
         <div className={`mt-4 flex items-center justify-between gap-4 rounded-md border px-4 py-3 ${crmDown ? "border-bad/40 bg-bad/5" : "border-line"}`}>
           <div className="min-w-0">
@@ -192,7 +197,7 @@ export function ChaosConsole() {
             <dd className="text-lg font-semibold tabular-nums text-ok">{counts.delivered}</dd>
           </div>
           <div className="py-2">
-            <dt className="text-xs text-faint">dead-letter</dt>
+            <dt className="text-xs text-faint" title="Dead-Letter Queue per revisione manuale">in revisione (DLQ)</dt>
             <dd className={`text-lg font-semibold tabular-nums ${counts.dead > 0 ? "text-bad" : "text-ink"}`}>{counts.dead}</dd>
           </div>
         </dl>
@@ -267,13 +272,31 @@ export function ChaosConsole() {
 
         <details className="group mt-2 rounded-md border border-line">
           <summary className="flex min-h-11 items-center justify-between gap-3 px-3 text-sm font-medium text-ink">
-            Politica di retry
+            Politica di retry &amp; formule matematiche
             <ChevronRight className="h-4 w-4 transition-transform group-open:rotate-90" aria-hidden="true" />
           </summary>
           <p className="border-t border-line px-3 py-3 font-mono text-xs leading-relaxed text-muted">
             Backoff esponenziale {DEFAULT_BACKOFF_POLICY.baseDelayMs / 1000}s × {DEFAULT_BACKOFF_POLICY.factor}^n (max{" "}
-            {DEFAULT_BACKOFF_POLICY.maxDelayMs / 1000}s) + jitter 50–100% · DLQ dopo {DEFAULT_BACKOFF_POLICY.maxAttempts} tentativi
+            {DEFAULT_BACKOFF_POLICY.maxDelayMs / 1000}s) + jitter 50–100% · Spostamento in DLQ dopo {DEFAULT_BACKOFF_POLICY.maxAttempts} tentativi falliti
           </p>
+        </details>
+
+        <details className="group mt-2 rounded-md border border-line">
+          <summary className="flex min-h-11 items-center justify-between gap-3 px-3 text-sm font-medium text-ink">
+            Architettura doppio stadio (Client → Edge → CRM)
+            <ChevronRight className="h-4 w-4 transition-transform group-open:rotate-90" aria-hidden="true" />
+          </summary>
+          <div className="border-t border-line px-3 py-3 text-xs leading-relaxed text-muted space-y-2">
+            <p>
+              <strong>Stadio 1 (Client → Edge):</strong> Outbox locale su IndexedDB nel browser per resilienza alla perdita improvvisa di connettività del dispositivo durante la compilazione.
+            </p>
+            <p>
+              <strong>Stadio 2 (Edge → CRM):</strong> L&apos;Edge risponde <code>202 Accepted</code> e inserisce il lead in una coda persistente server-side (Cloudflare Queues / Redis) con retry asincroni indipendenti dalla chiusura del browser.
+            </p>
+            <p className="font-mono text-[11px] text-faint border-t border-line pt-2">
+              * In questa sandbox dimostrativa, sia la coda che lo storage (IndexedDB) vengono eseguiti nel browser per consentire l&apos;ispezione interattiva in tempo reale senza mutare code cloud condivise.
+            </p>
+          </div>
         </details>
       </section>
     </div>

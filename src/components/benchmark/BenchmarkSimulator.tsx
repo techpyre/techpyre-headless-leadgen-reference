@@ -240,8 +240,14 @@ export function BenchmarkSimulator({ variant = "full" }: { variant?: "compact" |
           </div>
 
           {!full ? (
-            <Link href="/benchmark" className="mt-5 inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-ink hover:text-accent">
-              Ipotesi, formule e fonti <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            <div className="mt-4 rounded-md bg-panel p-3 text-xs leading-relaxed text-muted border border-line">
+              <span className="font-semibold text-ink">Nota metodologica del calcolo:</span> modello basato sulla differenza di drop-off mobile tra LCP a {input.legacy.lcpSeconds}s (Legacy CMS, {Math.round(input.legacy.abandonmentRate * 100)}% abbandono) e LCP a {input.edge.lcpSeconds}s (Edge, {(input.edge.abandonmentRate * 100).toFixed(1)}% abbandono), sommata al {Math.round(input.legacy.leadLossRate * 100)}% di mancata consegna form per timeout/errori sincroni verso il CRM (azzerati dall&apos;Outbox Edge).
+            </div>
+          ) : null}
+
+          {!full ? (
+            <Link href="/benchmark" className="mt-4 inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-ink hover:text-accent">
+              Ipotesi, formule passo-passo e fonti <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           ) : null}
         </div>
