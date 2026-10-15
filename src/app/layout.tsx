@@ -1,5 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import { SandboxProvider } from "@/components/sandbox/SandboxProvider";
+import { EdgeInspector } from "@/components/sandbox/EdgeInspector";
+import { SiteHeader } from "@/components/marketing/SiteHeader";
+import { Footer } from "@/components/marketing/Footer";
 import "./globals.css";
 
 const inter = Inter({
@@ -24,13 +28,14 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
-  themeColor: "#05070A",
-  colorScheme: "dark",
+  viewportFit: "cover",
+  themeColor: "#111418",
+  colorScheme: "light",
 };
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://headless-demo.techpyre.eu"),
-  title,
+  title: { default: title, template: "%s — Kinetix X400 · TechPYRE Reference Architecture #2" },
   description,
   applicationName: "TechPYRE Reference Architecture #2",
   authors: [{ name: "Riccardo Granza", url: "https://www.techpyre.eu" }],
@@ -65,10 +70,22 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
+/**
+ * Layout radice: la sandbox (toggle chaos + outbox) e la barra TechPYRE sono condivise
+ * da tutte le pagine, così la coda dei lead continua a lavorare durante la navigazione.
+ * Le pagine restano prerenderizzate staticamente.
+ */
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="it" className={`${inter.variable} ${jetbrains.variable}`}>
-      <body className="bg-void font-sans text-ink antialiased">{children}</body>
+      <body className="bg-paper font-sans text-ink antialiased">
+        <SandboxProvider>
+          <EdgeInspector />
+          <SiteHeader />
+          <main>{children}</main>
+          <Footer />
+        </SandboxProvider>
+      </body>
     </html>
   );
 }

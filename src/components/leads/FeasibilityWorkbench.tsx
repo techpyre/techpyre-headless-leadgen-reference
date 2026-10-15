@@ -17,7 +17,7 @@ export function FeasibilityWorkbench() {
   return (
     <div className="space-y-6">
       <RoiConfigurator input={input} result={result} onChange={setInput} />
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid items-start gap-6 lg:grid-cols-2">
         <LeadForm roiSnapshot={snapshot} />
         <ChaosConsole />
       </div>

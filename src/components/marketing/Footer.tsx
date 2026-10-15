@@ -1,46 +1,47 @@
-import { TriangleAlert } from "lucide-react";
+import Link from "next/link";
 import { COMPANY, TECHPYRE } from "@/data/kinetix";
 import { GithubMark } from "@/components/ui/GithubMark";
 
+const LINKS = [
+  { href: "/", label: "Home" },
+  { href: "/x400", label: "Scheda tecnica X400" },
+  { href: "/benchmark", label: "Benchmark" },
+  { href: "/architettura", label: "Architettura" },
+] as const;
+
 export function Footer() {
   return (
-    <footer className="bg-surface">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-        <div className="flex gap-3 rounded-xl border border-amber/40 bg-amber/5 p-4 text-sm text-ink-muted">
-          <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber" aria-hidden="true" />
-          <p>
-            <strong className="text-ink">Azienda fittizia a scopo dimostrativo — dati simulati in memoria / nessun dato reale.</strong>{" "}
-            {COMPANY.name} non esiste: prodotti, prezzi, parametri ROI e ipotesi del benchmark sono valori di modello. I
-            lead inviati restano nell&apos;IndexedDB del tuo browser e nel webhook CRM simulato (memoria volatile del
-            server), senza alcun invio a CRM reali.
-          </p>
-        </div>
-        <div className="mt-8 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-sm text-ink">
-              Reference Architecture progettata da{" "}
-              <a href={TECHPYRE.url} className="font-semibold text-emerald-soft underline-offset-4 hover:underline">
-                {TECHPYRE.name}
-              </a>{" "}
-              — {TECHPYRE.studio}
-            </p>
-            <p className="mt-1 text-sm text-ink-muted">
-              <a href={TECHPYRE.url} className="underline-offset-4 hover:text-ink hover:underline">
-                https://www.techpyre.eu
-              </a>{" "}
-              · Head of Studio: {TECHPYRE.head}
-            </p>
-          </div>
-          <a
-            href={TECHPYRE.repoUrl}
-            className="inline-flex items-center gap-2 self-start rounded-lg border border-line-strong px-4 py-2 text-sm text-ink transition-colors hover:border-cyan hover:text-cyan"
-          >
-            <GithubMark /> Codice sorgente su GitHub (MIT)
+    <footer className="border-t border-line bg-panel" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+        <p className="max-w-3xl text-sm leading-relaxed text-muted">
+          <strong className="font-semibold text-ink">Azienda fittizia a scopo dimostrativo — dati simulati in memoria / nessun dato reale.</strong>{" "}
+          {COMPANY.name} non esiste: prezzi e ipotesi sono valori di modello. I lead restano nel tuo browser e in un webhook
+          simulato, mai in un CRM reale.
+        </p>
+
+        <div className="mt-8 flex flex-col gap-8 sm:flex-row sm:justify-between">
+          <nav aria-label="Pagine">
+            <ul className="grid grid-cols-2 gap-x-8 text-sm sm:flex sm:gap-6">
+              {LINKS.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="inline-flex min-h-11 items-center text-muted hover:text-ink sm:min-h-0">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <a href={TECHPYRE.repoUrl} className="inline-flex min-h-11 items-center gap-2 self-start text-sm text-muted hover:text-ink sm:min-h-0">
+            <GithubMark /> Codice sorgente (MIT)
           </a>
         </div>
-        <p className="mt-8 font-mono text-[11px] text-ink-faint">
-          Next.js App Router · React Server Components · Prerendering statico · Route Handler /api/crm/webhook · IndexedDB
-          Outbox · Web Crypto HMAC SHA-256
+
+        <p className="mt-8 border-t border-line pt-6 text-sm text-faint">
+          Reference Architecture #2 di{" "}
+          <a href={TECHPYRE.url} className="text-link">
+            {TECHPYRE.name}
+          </a>{" "}
+          — {TECHPYRE.studio} · {TECHPYRE.head}
         </p>
       </div>
     </footer>

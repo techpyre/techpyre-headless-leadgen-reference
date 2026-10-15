@@ -1,61 +1,43 @@
-import { SandboxProvider } from "@/components/sandbox/SandboxProvider";
-import { EdgeInspector } from "@/components/sandbox/EdgeInspector";
 import { Hero } from "@/components/marketing/Hero";
 import { FeasibilityWorkbench } from "@/components/leads/FeasibilityWorkbench";
 import { BenchmarkSimulator } from "@/components/benchmark/BenchmarkSimulator";
-import { Applications, ArchitectureComparison, SectionHeading, SectorsServed, SpecsTable } from "@/components/marketing/Sections";
-import { Footer } from "@/components/marketing/Footer";
+import { MoreLink, SectionHeading } from "@/components/marketing/Sections";
 
 /**
  * Pagina principale: prerenderizzata staticamente (nessuna API runtime).
  * Interattività confinata nei Client Components (Edge Inspector, configuratore, console, benchmark).
+ * Scheda tecnica, settori, modello del benchmark e architettura vivono in pagine dedicate.
  */
 export default function Home() {
   return (
-    <SandboxProvider>
-      <EdgeInspector />
-      <main>
-        <Hero />
+    <>
+      <Hero />
 
-        <section id="configuratore" aria-labelledby="configuratore-title" className="border-b border-line">
-          <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-            <SectionHeading eyebrow="Configuratore ROI industriale" title="Quanto rende una X400 sulla tua linea?" id="configuratore-title">
-              <p>
-                Tre passaggi, calcolo istantaneo con formule esplicite. Poi invia la richiesta di studio di fattibilità e
-                osserva nella console accanto cosa succede al lead quando il CRM aziendale va offline.
-              </p>
-            </SectionHeading>
-            <div className="mt-8">
-              <FeasibilityWorkbench />
-            </div>
+      <section id="configuratore" aria-labelledby="configuratore-title" className="border-b border-line bg-panel">
+        <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+          <SectionHeading title="Calcola il ROI" id="configuratore-title">
+            <p>Tre passaggi. Il risultato viene allegato alla richiesta.</p>
+          </SectionHeading>
+          <div className="mt-6">
+            <FeasibilityWorkbench />
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section id="benchmark" aria-labelledby="benchmark-title" className="border-b border-line">
-          <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-            <SectionHeading
-              eyebrow="Benchmark interattivo"
-              title="Legacy CMS vs TechPYRE Edge (+68% efficienza acquisizione)"
-              id="benchmark-title"
-            >
-              <p>
-                Stesso budget Ads, stesso copy, stesso tasso di conversione del form. Il modello è trasparente: ogni
-                parametro è visibile e modificabile, e il +68% emerge solo dalle ipotesi di default su abbandono e lead
-                persi.
-              </p>
-            </SectionHeading>
-            <div className="mt-8">
-              <BenchmarkSimulator />
-            </div>
+      <section id="benchmark" aria-labelledby="benchmark-title" className="border-b border-line">
+        <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+          <SectionHeading
+            title="Legacy CMS vs TechPYRE Edge"
+            id="benchmark-title"
+            action={<MoreLink href="/architettura">Perché è più veloce</MoreLink>}
+          >
+            <p>Stesso budget Ads, stesso form: quanti lead arrivano davvero al CRM.</p>
+          </SectionHeading>
+          <div className="mt-6">
+            <BenchmarkSimulator variant="compact" />
           </div>
-        </section>
-
-        <ArchitectureComparison />
-        <Applications />
-        <SpecsTable />
-        <SectorsServed />
-      </main>
-      <Footer />
-    </SandboxProvider>
+        </div>
+      </section>
+    </>
   );
 }
