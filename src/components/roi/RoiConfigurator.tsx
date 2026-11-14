@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { RoiInput, RoiResult, SectorId, ShiftCount } from "@/types/roi";
 import { ROI_INPUT_LIMITS, SECTOR_PROFILES, SHIFT_OPTIONS } from "@/data/roi";
 import { formatEuro, formatNumber } from "@/lib/format";
+import { NumericInput } from "@/components/ui/NumericInput";
 
 type Step = 1 | 2 | 3;
 
@@ -33,7 +34,6 @@ interface NumericFieldProps {
 
 function NumericField({ label, value, min, max, step, unit, hint, onChange }: NumericFieldProps) {
   const id = useId();
-  const [draft, setDraft] = useState<string | null>(null);
   const clamp = (raw: number) => Math.min(max, Math.max(min, raw));
   return (
     <div className="py-4">
@@ -42,29 +42,14 @@ function NumericField({ label, value, min, max, step, unit, hint, onChange }: Nu
           {label}
         </label>
         <div className="flex shrink-0 items-center gap-2">
-          <input
+          <NumericInput
             id={`${id}-number`}
-            type="number"
-            inputMode="decimal"
+            value={value}
             min={min}
             max={max}
             step={step}
-            value={draft ?? String(value)}
-            onChange={(event) => {
-              const raw = event.target.value;
-              setDraft(raw);
-              const parsed = Number(raw.replace(",", "."));
-              if (raw !== "" && Number.isFinite(parsed) && parsed >= min && parsed <= max) onChange(parsed);
-            }}
-            onBlur={() => {
-              if (draft !== null) {
-                const parsed = Number(draft.replace(",", "."));
-                if (draft !== "" && Number.isFinite(parsed)) onChange(clamp(parsed));
-              }
-              setDraft(null);
-            }}
-            className="field-input w-24 text-right tabular-nums"
-            aria-describedby={hint ? `${id}-hint` : undefined}
+            describedBy={hint ? `${id}-hint` : undefined}
+            onChange={onChange}
           />
           <span className="w-9 text-sm text-faint">{unit}</span>
         </div>

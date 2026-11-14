@@ -7,6 +7,7 @@ import type { BenchmarkInput, StackId, StackOutcome, StackProfile } from "@/type
 import { BENCHMARK_LIMITS, BENCHMARK_SOURCES, DEFAULT_BENCHMARK_INPUT } from "@/data/benchmark";
 import { computeBenchmark, theoreticalLeadRatio } from "@/lib/benchmark";
 import { formatEuro, formatEuroCents, formatNumber, formatPercent } from "@/lib/format";
+import { NumericInput } from "@/components/ui/NumericInput";
 
 interface ParamInputProps {
   label: string;
@@ -20,36 +21,13 @@ interface ParamInputProps {
 
 function ParamInput({ label, value, min, max, step, suffix, onChange }: ParamInputProps) {
   const id = useId();
-  const [draft, setDraft] = useState<string | null>(null);
   return (
     <div className="flex items-center justify-between gap-3 py-2">
       <label htmlFor={id} className="text-[15px] text-ink">
         {label}
       </label>
       <span className="flex shrink-0 items-center gap-1.5">
-        <input
-          id={id}
-          type="number"
-          inputMode="decimal"
-          min={min}
-          max={max}
-          step={step}
-          value={draft ?? String(value)}
-          onChange={(event) => {
-            const raw = event.target.value;
-            setDraft(raw);
-            const parsed = Number(raw.replace(",", "."));
-            if (raw !== "" && Number.isFinite(parsed) && parsed >= min && parsed <= max) onChange(parsed);
-          }}
-          onBlur={() => {
-            if (draft !== null && draft !== "") {
-              const parsed = Number(draft.replace(",", "."));
-              if (Number.isFinite(parsed)) onChange(Math.min(max, Math.max(min, parsed)));
-            }
-            setDraft(null);
-          }}
-          className="field-input w-24 text-right tabular-nums"
-        />
+        <NumericInput id={id} value={value} min={min} max={max} step={step} onChange={onChange} />
         <span className="w-4 text-sm text-faint">{suffix}</span>
       </span>
     </div>
