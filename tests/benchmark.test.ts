@@ -40,3 +40,16 @@ test("nessun lead consegnato → CPA e rapporto null, nessuna divisione per zero
   assert.equal(result.leadRatio, null);
   assert.equal(result.cpaReduction, null);
 });
+
+test("input NaN o infiniti vengono sanitizzati senza propagare NaN", () => {
+  const result = computeBenchmark({
+    ...DEFAULT_BENCHMARK_INPUT,
+    monthlyClicks: Number.NaN,
+    averageCpc: Number.POSITIVE_INFINITY,
+    formConversionRate: Number.NaN,
+  });
+  assert.equal(result.legacy.deliveredLeads, 0);
+  assert.equal(result.edge.deliveredLeads, 0);
+  assert.equal(result.legacy.monthlySpend, 0);
+  assert.equal(result.leadRatio, null);
+});

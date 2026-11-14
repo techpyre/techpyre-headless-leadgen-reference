@@ -128,14 +128,24 @@ export function validateLeadForm(values: LeadFormValues): LeadFormErrors {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
-/** Type guard usato dal Route Handler sul corpo JSON ricevuto. */
 export function isLeadPayload(value: unknown): value is LeadPayload {
   if (!isRecord(value)) return false;
   const { idempotencyKey, submittedAt, source, contact, consent } = value;
-  if (typeof idempotencyKey !== "string" || typeof submittedAt !== "string") return false;
+  if (typeof idempotencyKey !== "string" || idempotencyKey.trim().length < 8) return false;
+  if (typeof submittedAt !== "string" || Number.isNaN(Date.parse(submittedAt))) return false;
   if (source !== "kinetix-x400-feasibility-form") return false;
-  if (!isRecord(contact) || !isRecord(consent)) return false;
+  if (!isRecord(contact) || !isRecord(consent) || consent.privacy !== true) return false;
+
   const fields = ["fullName", "role", "company", "email", "vatNumber"] as const;
   if (!fields.every((field) => typeof contact[field] === "string")) return false;
-  return consent.privacy === true;
+
+  const errors = validateLeadForm({
+    fullName: contact.fullName as string,
+    role: contact.role as string,
+    company: contact.company as string,
+    email: contact.email as string,
+    vatNumber: contact.vatNumber as string,
+    privacyConsent: true,
+  });
+  return Object.keys(errors).length === 0;
 }

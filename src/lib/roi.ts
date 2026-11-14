@@ -44,6 +44,12 @@ export function findSector(sectorId: RoiInput["sector"], sectors: readonly Secto
   return sector;
 }
 
+const finiteNonNegative = (value: number, fallback = 0): number =>
+  Number.isFinite(value) && value >= 0 ? value : fallback;
+
+const clampFraction = (value: number): number =>
+  Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0;
+
 const paybackMonths = (investment: number, netAnnualSavings: number): number | null =>
   netAnnualSavings > 0 ? (investment / netAnnualSavings) * 12 : null;
 
@@ -54,14 +60,16 @@ export function computeRoi(
   tiers: readonly OpticsTier[],
 ): RoiResult {
   const sector = findSector(input.sector, sectors);
-  const opticsTier = selectOpticsTier(input.toleranceMicron, tiers);
+  const toleranceMicron = finiteNonNegative(input.toleranceMicron, 100);
+  const opticsTier = selectOpticsTier(toleranceMicron, tiers);
 
-  const piecesPerHour = Math.max(0, input.piecesPerHour);
-  const scrapRate = Math.min(1, Math.max(0, input.currentScrapRate));
-  const pieceCost = Math.max(0, input.averagePieceCost);
-  const taxCreditRate = Math.min(1, Math.max(0, input.taxCreditRate));
+  const shifts = Math.max(1, Math.floor(finiteNonNegative(input.shifts, 1)));
+  const piecesPerHour = finiteNonNegative(input.piecesPerHour);
+  const scrapRate = clampFraction(input.currentScrapRate);
+  const pieceCost = finiteNonNegative(input.averagePieceCost);
+  const taxCreditRate = clampFraction(input.taxCreditRate);
 
-  const annualHours = input.shifts * assumptions.hoursPerShift * assumptions.operatingDays;
+  const annualHours = shifts * assumptions.hoursPerShift * assumptions.operatingDays;
   const annualPieces = piecesPerHour * annualHours;
   const currentScrapCost = annualPieces * scrapRate * pieceCost;
   const scrapSavings = currentScrapCost * sector.scrapReduction;
@@ -81,7 +89,7 @@ export function computeRoi(
     {
       id: "annual-hours",
       label: "Ore produttive annue",
-      formula: `${input.shifts} turni × ${assumptions.hoursPerShift} h × ${assumptions.operatingDays} giorni`,
+      formula: `${shifts} turni × ${assumptions.hoursPerShift} h × ${assumptions.operatingDays} giorni`,
       value: annualHours,
       unit: "h",
     },

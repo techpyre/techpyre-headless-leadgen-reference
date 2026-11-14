@@ -58,3 +58,18 @@ test("lo snapshot allegato al lead è arrotondato e coerente", () => {
   assert.equal(snapshot.opticsTier, "precision");
   assert.equal(snapshot.sector, "automotive");
 });
+
+test("input non finiti o negativi non propagano NaN nel calcolo ROI", () => {
+  const result = run({
+    shifts: Number.NaN as never,
+    piecesPerHour: Number.POSITIVE_INFINITY,
+    currentScrapRate: Number.NaN,
+    averagePieceCost: -50,
+    taxCreditRate: Number.NaN,
+    toleranceMicron: Number.NaN,
+  });
+  assert.ok(Number.isFinite(result.annualHours));
+  assert.ok(Number.isFinite(result.annualPieces));
+  assert.ok(Number.isFinite(result.investment));
+  assert.ok(Number.isFinite(result.netAnnualSavings));
+});

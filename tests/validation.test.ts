@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   computeVatCheckDigit,
+  isLeadPayload,
   isValidItalianVat,
   isWebmailDomain,
   getEmailDomain,
@@ -50,4 +51,25 @@ test("validazione completa del form", () => {
   assert.ok(errors.email?.includes("@gmail.com"));
   assert.ok(errors.vatNumber);
   assert.ok(errors.privacyConsent);
+});
+
+test("isLeadPayload applica le stesse invarianti di dominio del form", () => {
+  const base = {
+    idempotencyKey: "12345678-1234-4123-8123-123456789012",
+    submittedAt: "2026-11-14T12:00:00.000Z",
+    source: "kinetix-x400-feasibility-form",
+    contact: {
+      fullName: "Giulia Ferrari",
+      role: "Responsabile Qualità",
+      company: "Officine Meccaniche Esempio S.p.A.",
+      email: "g.ferrari@officine-esempio.it",
+      vatNumber: "00743110157",
+    },
+    consent: { privacy: true },
+  };
+  assert.equal(isLeadPayload(base), true);
+  assert.equal(isLeadPayload({ ...base, contact: { ...base.contact, email: "giulia@gmail.com" } }), false);
+  assert.equal(isLeadPayload({ ...base, contact: { ...base.contact, vatNumber: "00743110150" } }), false);
+  assert.equal(isLeadPayload({ ...base, submittedAt: "not-a-date" }), false);
+  assert.equal(isLeadPayload({ ...base, idempotencyKey: "short" }), false);
 });

@@ -9,7 +9,11 @@ import type { BenchmarkInput, BenchmarkResult, StackOutcome, StackProfile } from
  * la differenza dipende solo da quanti visitatori vedono la pagina e da quanti lead arrivano al CRM.
  */
 
-const clampFraction = (value: number): number => Math.min(1, Math.max(0, value));
+const clampFraction = (value: number): number =>
+  Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0;
+
+const finiteNonNegative = (value: number): number =>
+  Number.isFinite(value) && value > 0 ? value : 0;
 
 export function computeStackOutcome(
   profile: StackProfile,
@@ -17,12 +21,12 @@ export function computeStackOutcome(
   averageCpc: number,
   formConversionRate: number,
 ): StackOutcome {
-  const clicks = Math.max(0, monthlyClicks);
+  const clicks = finiteNonNegative(monthlyClicks);
   const abandonment = clampFraction(profile.abandonmentRate);
   const conversion = clampFraction(formConversionRate);
   const deliveryRate = 1 - clampFraction(profile.leadLossRate);
 
-  const monthlySpend = clicks * Math.max(0, averageCpc);
+  const monthlySpend = clicks * finiteNonNegative(averageCpc);
   const engagedVisitors = clicks * (1 - abandonment);
   const submittedLeads = engagedVisitors * conversion;
   const deliveredLeads = submittedLeads * deliveryRate;
